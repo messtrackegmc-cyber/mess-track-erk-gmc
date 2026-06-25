@@ -1,0 +1,57 @@
+Before manual script delete:
+[
+  {
+    id: 8089,
+    student_id: 34,
+    mess_number: '1',
+    leave_date: '2026-04-04',
+    status: 'Approved',
+    created_at: '2026-04-04T06:46:57.212503+00:00',
+    is_admin_granted: true,
+    hostel_id: '89cb3c17-9093-4fa7-8c5f-5bfacade61b7'
+  },
+  {
+    id: 8090,
+    student_id: 35,
+    mess_number: '2',
+    leave_date: '2026-04-04',
+    status: 'Approved',
+    created_at: '2026-04-04T06:46:57.212503+00:00',
+    is_admin_granted: true,
+    hostel_id: '89cb3c17-9093-4fa7-8c5f-5bfacade61b7'
+  },
+  {
+    id: 8091,
+    student_id: 40,
+    mess_number: '3',
+    leave_date: '2026-04-04',
+    status: 'Approved',
+    created_at: '2026-04-04T06:46:57.212503+00:00',
+    is_admin_granted: true,
+    hostel_id: '89cb3c17-9093-4fa7-8c5f-5bfacade61b7'
+  },
+  {
+    id: 8092,
+    student_id: 37,
+    mess_number: '4',
+    leave_date: '2026-04-04',
+    status: 'Approved',
+    created_at: '2026-04-04T06:46:57.212503+00:00',
+    is_admin_granted: true,
+    hostel_id: '89cb3c17-9093-4fa7-8c5f-5bfacade61b7'
+  },
+  {
+    id: 8093,
+    student_id: 38,
+    mess_number: '5',
+    leave_date: '2026-04-04',
+    status: 'Approved',
+    created_at: '2026-04-04T06:46:57.212503+00:00',
+    is_admin_granted: true,
+    hostel_id: '89cb3c17-9093-4fa7-8c5f-5bfacade61b7'
+  }
+]
+Executing exact delete from ManageLeaves:
+Delete error: null
+Deleted rows: 197
+After: 1
