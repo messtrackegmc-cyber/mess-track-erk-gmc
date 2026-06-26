@@ -29,8 +29,8 @@ export default function Navbar({ onMenuClick }) {
                     </button>
  
                     <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center shadow-sm">
-                            <Logo className="w-4 h-4 text-white" />
+                        <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center border border-gray-200 shadow-sm">
+                            <Logo className="w-4 h-4 text-black" />
                         </div>
                         <span className="text-lg font-bold text-gray-900 tracking-tight hidden sm:block">Mess Track-E</span>
                     </div>
