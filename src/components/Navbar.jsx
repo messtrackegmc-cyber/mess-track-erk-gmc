@@ -1,8 +1,9 @@
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, ChefHat, Menu } from 'lucide-react';
+import { LogOut, Menu } from 'lucide-react';
 import { Button } from './ui/button';
 import { Separator } from './ui/separator';
+import { Logo } from './Logo';
 
 export default function Navbar({ onMenuClick }) {
     const { user, logout } = useAuth();
@@ -26,12 +27,12 @@ export default function Navbar({ onMenuClick }) {
                     >
                         <Menu className="w-6 h-6" />
                     </button>
-
+ 
                     <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center shadow-sm shadow-indigo-200">
-                            <ChefHat className="w-4 h-4 text-white" />
+                        <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center shadow-sm">
+                            <Logo className="w-4 h-4 text-white" />
                         </div>
-                        <span className="text-lg font-bold text-gray-900 tracking-tight hidden sm:block">MessPro</span>
+                        <span className="text-lg font-bold text-gray-900 tracking-tight hidden sm:block">Mess Track-E</span>
                     </div>
                 </div>
 
