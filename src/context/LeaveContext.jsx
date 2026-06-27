@@ -67,7 +67,7 @@ export function LeaveProvider({ children }) {
         while (keepFetching) {
             let query = supabase
                 .from('leaves')
-                .select('leave_date, mess_number, is_admin_granted')
+                .select('leave_date, mess_number')
                 .eq('status', 'Approved')
                 .eq('hostel_id', user.hostelId)
                 .gte('leave_date', pastStr)
@@ -110,9 +110,9 @@ export function LeaveProvider({ children }) {
             if (existingIdx === -1) {
                 leavesMap[d].push({
                     messNumber: record.mess_number,
-                    isAdminGranted: record.is_admin_granted
+                    isAdminGranted: false // record.is_admin_granted column missing in DB
                 });
-            } else if (record.is_admin_granted && !leavesMap[d][existingIdx].isAdminGranted) {
+            } else if (false) {
                 // Overwrite student leave with admin leave priority
                 leavesMap[d][existingIdx].isAdminGranted = true;
             }
@@ -186,8 +186,7 @@ export function LeaveProvider({ children }) {
             mess_number: messNumber,
             leave_date: shapeDate,
             status: 'Approved',
-            hostel_id: user.hostelId,
-            is_admin_granted: isAdminGranted
+            hostel_id: user.hostelId
         }]);
 
         if (error) {
@@ -208,8 +207,7 @@ export function LeaveProvider({ children }) {
             mess_number: s.messNumber,
             leave_date: shapeDate,
             status: 'Approved',
-            hostel_id: user.hostelId,
-            is_admin_granted: isAdminGranted
+            hostel_id: user.hostelId
         }));
 
         // Optimistic update

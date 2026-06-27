@@ -10,11 +10,40 @@ import { useLeaves } from '../context/LeaveContext';
 import { useAuth } from '../context/AuthContext';
 import { useHostel } from '../context/HostelContext';
 
+const formatDateLocal = (date) => {
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+};
+
+const validateConsecutiveLeaves = (dates) => {
+    const dateSet = new Set(dates.map(d => d.date));
+    for (const item of dates) {
+        if (item.isAdminGranted) continue;
+        
+        const current = new Date(item.date + 'T00:00:00');
+        
+        const prev = new Date(current);
+        prev.setDate(prev.getDate() - 1);
+        const prevStr = formatDateLocal(prev);
+
+        const next = new Date(current);
+        next.setDate(next.getDate() + 1);
+        const nextStr = formatDateLocal(next);
+
+        if (!dateSet.has(prevStr) && !dateSet.has(nextStr)) {
+            return { valid: false, invalidDate: item.date };
+        }
+    }
+    return { valid: true };
+};
+
 export default function LeaveSelection() {
     const { user } = useAuth();
     const { getLeavesByDate, addLeave, removeLeave, leaves } = useLeaves();
     const { cutoffTime, maxLeaves } = useHostel();
-    const isUnlimited = maxLeaves === null;
+    const isUnlimited = true; // maxLeaves === null;
 
     const [today, setToday] = useState(new Date());
     const [currentMonth, setCurrentMonth] = useState(today.getMonth());
@@ -161,6 +190,17 @@ export default function LeaveSelection() {
             return;
         }
 
+        const validation = validateConsecutiveLeaves(selectedDates);
+        if (!validation.valid) {
+            const d = new Date(validation.invalidDate + 'T00:00:00');
+            const formatted = d.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
+            toast.error(`Leaves must be taken for at least 2 consecutive days. Your leave on ${formatted} is isolated.`, {
+                id: 'saving',
+                duration: 4000
+            });
+            return;
+        }
+
         toast.loading('Saving changes...', { id: 'saving' });
 
         try {
@@ -180,12 +220,18 @@ export default function LeaveSelection() {
 
             // Process Additions
             for (const entry of toAdd) {
-                await addLeave(user.messNumber, entry.date, user.id, false);
+                const res = await addLeave(user.messNumber, entry.date, user.id, false);
+                if (!res.success) {
+                    throw new Error(`Failed to add leave on ${entry.date}: ${res.error}`);
+                }
             }
 
             // Process Removals
             for (const entry of toRemove) {
-                await removeLeave(user.messNumber, entry.date);
+                const res = await removeLeave(user.messNumber, entry.date);
+                if (!res.success) {
+                    throw new Error(`Failed to remove leave on ${entry.date}: ${res.error}`);
+                }
             }
 
             toast.success('Leave preferences saved successfully', { id: 'saving' });
@@ -260,6 +306,16 @@ export default function LeaveSelection() {
                             </div>
                         </div>
                     )}
+
+                    <div className="flex gap-3 p-4 bg-indigo-50 border border-indigo-100 rounded-lg">
+                        <Info className="w-5 h-5 text-indigo-600 shrink-0" />
+                        <div>
+                            <p className="text-sm font-semibold text-indigo-900">Consecutive Days Rule</p>
+                            <p className="text-sm text-indigo-700 mt-0.5">
+                                Leaves must be taken for at least <strong>2 consecutive days</strong> (e.g., you cannot take leave for 22nd June alone; it must be at least 22 and 23 June).
+                            </p>
+                        </div>
+                    </div>
 
                     {/* Warning when nearing or at limit — hidden for unlimited hostels */}
                     {!isUnlimited && remainingLeaves <= 2 && remainingLeaves > 0 && (
