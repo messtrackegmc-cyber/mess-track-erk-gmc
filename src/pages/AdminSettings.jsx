@@ -24,15 +24,24 @@ export default function AdminSettings() {
         e.preventDefault();
         setIsSaving(true);
 
+        const parsedRate = parseInt(rate, 10);
+        const parsedCutoff = parseInt(cutoff, 10);
+
+        if (isNaN(parsedRate) || parsedRate < 0) {
+            toast.error('Please enter a valid mess rate.');
+            setIsSaving(false);
+            return;
+        }
+
         const result = await updateSettings({
-            messRate: parseInt(rate),
-            cutoffTime: parseInt(cutoff),
+            messRate: parsedRate,
+            cutoffTime: parsedCutoff,
         });
 
         if (result.success) {
             toast.success('Settings updated successfully');
         } else {
-            toast.error('Failed to update settings: ' + result.error);
+            toast.error('Failed to update settings: ' + (result.error || 'Unknown error'));
         }
         setIsSaving(false);
     };
