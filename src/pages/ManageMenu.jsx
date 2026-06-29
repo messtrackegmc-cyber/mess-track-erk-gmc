@@ -24,12 +24,10 @@ export default function ManageMenu() {
     // Let's implement immediate updates for simplicity and better UX in this context, 
     // OR local buffer. Let's do local buffer for the selected day to avoid excessive DB writes while typing/adding.
 
-    const [localDayMenu, setLocalDayMenu] = useState(null);
+    const [localDayMenu, setLocalDayMenu] = useState({ breakfast: [], lunch: [], snack: [], dinner: [] });
 
     useEffect(() => {
-        if (weeklyMenu[selectedDay]) {
-            setLocalDayMenu(weeklyMenu[selectedDay]);
-        }
+        setLocalDayMenu(weeklyMenu[selectedDay] || { breakfast: [], lunch: [], snack: [], dinner: [] });
     }, [weeklyMenu, selectedDay]);
 
     const handleSave = async () => {

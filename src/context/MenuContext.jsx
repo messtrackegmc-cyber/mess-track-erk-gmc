@@ -83,26 +83,36 @@ export function MenuProvider({ children }) {
     const updateDayMenu = async (day, mealType, newItems) => {
         if (!user?.hostelId) return { success: false, error: 'No hostel assigned' };
 
+        const currentDayMenu = weeklyMenu[day] || { breakfast: [], lunch: [], snack: [], dinner: [] };
+        const updatedDayMenu = {
+            ...currentDayMenu,
+            [mealType]: newItems
+        };
+
         // Optimistic update
         setWeeklyMenu(prev => {
             const updated = {
                 ...prev,
-                [day]: {
-                    ...prev[day],
-                    [mealType]: newItems
-                }
+                [day]: updatedDayMenu
             };
             // Update LocalStorage immediately
             localStorage.setItem(`menu_${user.hostelId}`, JSON.stringify(updated));
             return updated;
         });
 
-        // DB Update
+        // DB Update using upsert to handle missing rows
         const { error } = await supabase
             .from('weekly_menu')
-            .update({ [mealType]: newItems })
-            .eq('day_of_week', day)
-            .eq('hostel_id', user.hostelId);
+            .upsert({
+                hostel_id: user.hostelId,
+                day_of_week: day,
+                breakfast: updatedDayMenu.breakfast || [],
+                lunch: updatedDayMenu.lunch || [],
+                snack: updatedDayMenu.snack || [],
+                dinner: updatedDayMenu.dinner || []
+            }, {
+                onConflict: 'hostel_id,day_of_week'
+            });
 
         if (error) {
             console.error('Error updating menu:', error);
@@ -111,7 +121,6 @@ export function MenuProvider({ children }) {
         }
         return { success: true };
     };
-
     return (
         <MenuContext.Provider value={{ weeklyMenu, updateDayMenu, loading }}>
             {children}
