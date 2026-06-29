@@ -24,7 +24,7 @@ export function HostelProvider({ children }) {
             try {
                 const { data, error } = await supabase
                     .from('hostels')
-                    .select('name, mess_rate, cutoff_time, max_leaves')
+                    .select('name, mess_rate, cutoff_time')
                     .eq('id', user.hostelId)
                     .single();
 
@@ -40,7 +40,7 @@ export function HostelProvider({ children }) {
                         messRate: data.mess_rate,
                         cutoffTime: data.cutoff_time,
                         hostelName: data.name,
-                        maxLeaves: data.max_leaves, // null from DB = unlimited
+                        maxLeaves: null, // Hardcoded to unlimited leaves
                         loading: false,
                     });
                 }
