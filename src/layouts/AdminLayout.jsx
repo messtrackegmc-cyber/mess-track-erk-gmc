@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import AdminSidebar from '../components/AdminSidebar';
 import MobileNav from '../components/MobileNav';
-import { Bell, LayoutDashboard, UtensilsCrossed, Users, Menu, FileSpreadsheet, Settings, CalendarCheck } from 'lucide-react';
+import { Bell, LayoutDashboard, UtensilsCrossed, Users, Menu, FileSpreadsheet, Settings, CalendarCheck, Calendar } from 'lucide-react';
 import { Button } from '../components/ui/button';
 
 export default function AdminLayout() {
@@ -10,6 +10,7 @@ export default function AdminLayout() {
 
     const navItems = [
         { to: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+        { to: '/admin/tomorrow', label: 'Tomorrow', icon: Calendar },
         { to: '/admin/menu', label: 'Manage Menu', icon: UtensilsCrossed },
         { to: '/admin/students', label: 'Students', icon: Users },
         { to: '/admin/leaves', label: 'Leave Reports', icon: Bell },

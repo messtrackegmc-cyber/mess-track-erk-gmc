@@ -48,6 +48,7 @@ export default function App() {
                 }
             >
                 <Route index element={<AdminDashboard />} />
+                <Route path="tomorrow" element={<AdminDashboard showTomorrow={true} />} />
                 <Route path="menu" element={<ManageMenu />} />
                 <Route path="students" element={<ManageStudents />} />
                 <Route path="leaves" element={<ManageLeaves />} />

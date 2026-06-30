@@ -8,13 +8,15 @@ import {
     Bell,
     FileSpreadsheet,
     Settings,
-    CalendarCheck
+    CalendarCheck,
+    Calendar
 } from 'lucide-react';
 import { Separator } from './ui/separator';
 import { Logo } from './Logo';
 
 const navItems = [
     { to: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+    { to: '/admin/tomorrow', label: 'Tomorrow', icon: Calendar },
     { to: '/admin/menu', label: 'Manage Menu', icon: UtensilsCrossed },
     { to: '/admin/students', label: 'Students', icon: Users },
     { to: '/admin/leaves', label: 'Leave Reports', icon: Bell },
