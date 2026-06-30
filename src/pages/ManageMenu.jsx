@@ -10,7 +10,7 @@ import toast, { Toaster } from 'react-hot-toast';
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 export default function ManageMenu() {
-    const { weeklyMenu, updateDayMenu, loading } = useMenu();
+    const { weeklyMenu, updateDayMenu, saveDayMenu, loading } = useMenu();
     const [selectedDay, setSelectedDay] = useState('Monday');
 
     // Local state to manage edits before save (optional, but requested flow was direct save? 
@@ -34,17 +34,15 @@ export default function ManageMenu() {
         if (!localDayMenu) return;
 
         toast.loading('Saving menu...', { id: 'saving-menu' });
-        try {
-            // Update all 3 meals for the day
-            await updateDayMenu(selectedDay, 'breakfast', localDayMenu.breakfast);
-            await updateDayMenu(selectedDay, 'lunch', localDayMenu.lunch);
-            await updateDayMenu(selectedDay, 'snack', localDayMenu.snack || []);
-            await updateDayMenu(selectedDay, 'dinner', localDayMenu.dinner);
-
-            toast.success(`Menu for ${selectedDay} updated successfully`, { id: 'saving-menu' });
-        } catch (error) {
-            console.error(error);
+        // Use saveDayMenu to upsert all meals in a single DB call.
+        // Previously called updateDayMenu 4 times which caused stale-closure
+        // overwrites — each call read the same pre-render weeklyMenu state and
+        // the last call (dinner) would clobber the others.
+        const result = await saveDayMenu(selectedDay, localDayMenu);
+        if (result?.success === false) {
             toast.error('Failed to update menu', { id: 'saving-menu' });
+        } else {
+            toast.success(`Menu for ${selectedDay} updated successfully`, { id: 'saving-menu' });
         }
     };
 

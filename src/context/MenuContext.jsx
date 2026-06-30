@@ -121,8 +121,50 @@ export function MenuProvider({ children }) {
         }
         return { success: true };
     };
+
+    // Saves all 4 meals for a day in a single upsert.
+    // Use this instead of calling updateDayMenu 4 times to avoid stale-closure overwrites.
+    const saveDayMenu = async (day, fullDayMenu) => {
+        if (!user?.hostelId) return { success: false, error: 'No hostel assigned' };
+
+        const merged = {
+            breakfast: [],
+            lunch: [],
+            snack: [],
+            dinner: [],
+            ...fullDayMenu
+        };
+
+        // Optimistic update
+        setWeeklyMenu(prev => {
+            const updated = { ...prev, [day]: merged };
+            localStorage.setItem(`menu_${user.hostelId}`, JSON.stringify(updated));
+            return updated;
+        });
+
+        const { error } = await supabase
+            .from('weekly_menu')
+            .upsert({
+                hostel_id: user.hostelId,
+                day_of_week: day,
+                breakfast: merged.breakfast,
+                lunch: merged.lunch,
+                snack: merged.snack,
+                dinner: merged.dinner
+            }, {
+                onConflict: 'hostel_id,day_of_week'
+            });
+
+        if (error) {
+            console.error('Error saving menu:', error);
+            fetchMenu(); // Revert
+            return { success: false, error: error.message };
+        }
+        return { success: true };
+    };
+
     return (
-        <MenuContext.Provider value={{ weeklyMenu, updateDayMenu, loading }}>
+        <MenuContext.Provider value={{ weeklyMenu, updateDayMenu, saveDayMenu, loading }}>
             {children}
         </MenuContext.Provider>
     );
