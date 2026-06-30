@@ -98,11 +98,11 @@ export default function AdminDashboard() {
                                     <Skeleton className="h-5 w-28 mt-3" />
                                 ) : (
                                     <div className="flex items-center gap-2 mt-3">
-                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold">
+                                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 text-sm font-semibold">
                                             <span>♂</span>
                                             <span>{stat.males}M</span>
                                         </span>
-                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-pink-50 text-pink-600 text-xs font-semibold">
+                                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-pink-50 text-pink-600 text-sm font-semibold">
                                             <span>♀</span>
                                             <span>{stat.females}F</span>
                                         </span>
