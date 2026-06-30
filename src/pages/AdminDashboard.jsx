@@ -14,9 +14,20 @@ export default function AdminDashboard() {
 
     // Calculate stats
     const today = new Date().toLocaleDateString('en-CA');
+    const todayLeaves = getLeavesByDate(today) || [];
+
     const totalStudents = students.length;
-    const leavesToday = (getLeavesByDate(today) || []).length;
+    const totalMales = students.filter(s => s.messNumber?.toUpperCase().startsWith('M')).length;
+    const totalFemales = students.filter(s => s.messNumber?.toUpperCase().startsWith('F')).length;
+
+    const leavesToday = todayLeaves.length;
+    const leavesMaleToday = todayLeaves.filter(l => l.messNumber?.toUpperCase().startsWith('M')).length;
+    const leavesFemaleToday = todayLeaves.filter(l => l.messNumber?.toUpperCase().startsWith('F')).length;
+
     const activeToday = totalStudents - leavesToday;
+    const activeMaleToday = totalMales - leavesMaleToday;
+    const activeFemaleToday = totalFemales - leavesFemaleToday;
+
     const attendancePercentage = totalStudents > 0 ? Math.round((activeToday / totalStudents) * 100) : 0;
 
     const stats = [
@@ -26,7 +37,9 @@ export default function AdminDashboard() {
             desc: 'Registered students',
             icon: Users,
             color: 'text-blue-600',
-            bg: 'bg-blue-50'
+            bg: 'bg-blue-50',
+            males: totalMales,
+            females: totalFemales,
         },
         {
             label: 'Active Today',
@@ -34,7 +47,9 @@ export default function AdminDashboard() {
             desc: `${attendancePercentage}% attendance`,
             icon: UtensilsCrossed,
             color: 'text-emerald-600',
-            bg: 'bg-emerald-50'
+            bg: 'bg-emerald-50',
+            males: activeMaleToday,
+            females: activeFemaleToday,
         },
         {
             label: 'Leave Today',
@@ -42,7 +57,9 @@ export default function AdminDashboard() {
             desc: 'Students on leave',
             icon: AlertCircle,
             color: 'text-amber-600',
-            bg: 'bg-amber-50'
+            bg: 'bg-amber-50',
+            males: leavesMaleToday,
+            females: leavesFemaleToday,
         },
     ];
 
@@ -74,6 +91,22 @@ export default function AdminDashboard() {
                                     <Skeleton className="h-4 w-32 mt-1" />
                                 ) : (
                                     <p className="text-xs text-gray-400 mt-1">{stat.desc}</p>
+                                )}
+
+                                {/* Gender breakdown */}
+                                {isLoading ? (
+                                    <Skeleton className="h-5 w-28 mt-3" />
+                                ) : (
+                                    <div className="flex items-center gap-2 mt-3">
+                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold">
+                                            <span>♂</span>
+                                            <span>{stat.males}M</span>
+                                        </span>
+                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-pink-50 text-pink-600 text-xs font-semibold">
+                                            <span>♀</span>
+                                            <span>{stat.females}F</span>
+                                        </span>
+                                    </div>
                                 )}
                             </div>
                         </CardContent>
