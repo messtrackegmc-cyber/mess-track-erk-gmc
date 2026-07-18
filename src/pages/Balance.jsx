@@ -31,11 +31,15 @@ export default function Balance() {
     const currentYear = selectedDate.getFullYear();
     const currentMonth = selectedDate.getMonth();
     const isCurrentMonth = currentYear === now.getFullYear() && currentMonth === now.getMonth();
+    const isMinMonth = currentYear === 2025 && currentMonth === 0;
 
     const monthKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
     const monthName = selectedDate.toLocaleString('default', { month: 'long' });
 
-    const handlePrevMonth = () => setSelectedDate(new Date(currentYear, currentMonth - 1, 1));
+    const handlePrevMonth = () => {
+        if (isMinMonth) return;
+        setSelectedDate(new Date(currentYear, currentMonth - 1, 1));
+    };
     const handleNextMonth = () => setSelectedDate(new Date(currentYear, currentMonth + 1, 1));
 
     const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
@@ -155,7 +159,7 @@ export default function Balance() {
                 </div>
                 {/* Month Navigator */}
                 <div className="flex items-center gap-2">
-                    <Button variant="outline" size="icon" onClick={handlePrevMonth}>
+                    <Button variant="outline" size="icon" onClick={handlePrevMonth} disabled={isMinMonth}>
                         <ChevronLeft className="w-4 h-4" />
                     </Button>
                     <div className="font-semibold text-gray-900 min-w-[140px] text-center">

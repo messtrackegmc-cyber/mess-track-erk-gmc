@@ -24,8 +24,10 @@ export default function MessBill() {
     const currentMonth = selectedDate.getMonth(); // 0-indexed
 
     const isCurrentMonth = currentYear === now.getFullYear() && currentMonth === now.getMonth();
+    const isMinMonth = currentYear === 2025 && currentMonth === 0; // Jan 2025
 
     const handlePrevMonth = () => {
+        if (isMinMonth) return;
         setSelectedDate(new Date(currentYear, currentMonth - 1, 1));
     };
 
@@ -88,7 +90,7 @@ export default function MessBill() {
                     <p className="text-gray-500 text-lg">Billing details for {monthName} {currentYear}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                    <Button variant="outline" size="icon" onClick={handlePrevMonth}>
+                    <Button variant="outline" size="icon" onClick={handlePrevMonth} disabled={isMinMonth}>
                         <ChevronLeft className="w-4 h-4" />
                     </Button>
                     <div className="font-semibold text-gray-900 min-w-[140px] text-center">

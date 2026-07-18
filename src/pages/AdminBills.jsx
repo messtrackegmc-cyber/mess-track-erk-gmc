@@ -312,6 +312,7 @@ export default function AdminBills() {
                                     <Calendar className="w-4 h-4 text-gray-400 shrink-0" />
                                     <input
                                         type="month"
+                                        min="2025-01"
                                         className="text-sm outline-none text-gray-700 bg-transparent w-full sm:w-auto"
                                         value={selectedMonth}
                                         onChange={(e) => setSelectedMonth(e.target.value)}
@@ -323,6 +324,7 @@ export default function AdminBills() {
                                         <span className="text-xs text-gray-400 font-medium whitespace-nowrap">From</span>
                                         <input
                                             type="date"
+                                            min="2025-01-01"
                                             className="text-sm outline-none text-gray-700 bg-transparent w-full"
                                             value={startDate}
                                             onChange={(e) => setStartDate(e.target.value)}
@@ -333,6 +335,7 @@ export default function AdminBills() {
                                         <span className="text-xs text-gray-400 font-medium whitespace-nowrap">To</span>
                                         <input
                                             type="date"
+                                            min="2025-01-01"
                                             className="text-sm outline-none text-gray-700 bg-transparent w-full"
                                             value={endDate}
                                             onChange={(e) => setEndDate(e.target.value)}
