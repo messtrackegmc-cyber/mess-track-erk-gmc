@@ -94,10 +94,10 @@ export default function Balance() {
 
             if (data) {
                 setAmountPaid(data.amount_paid ?? 0);
-                setInputValue(String(data.amount_paid ?? ''));
+                setInputValue('');
                 setIsLocked(data.is_paid ?? false);
             } else {
-                setAmountPaid('');
+                setAmountPaid(0);
                 setInputValue('');
                 setIsLocked(false);
             }
@@ -114,12 +114,14 @@ export default function Balance() {
     }
     const activeDays = daysInMonth - leaveCount;
     const messBill = activeDays * messRate;
-    const paid = Number(amountPaid) || 0;
+    const currentTotalPaid = Number(amountPaid) || 0;
+    const newPayment = Number(inputValue) || 0;
+    const paid = currentTotalPaid + newPayment;
     const balance = messBill - paid;
 
     const handleSave = async () => {
-        const val = Number(inputValue);
-        if (isNaN(val) || val < 0) return;
+        const val = newPayment + currentTotalPaid;
+        if (isNaN(newPayment) || newPayment <= 0) return;
 
         setSaving(true);
         const { error } = await supabase
@@ -136,6 +138,7 @@ export default function Balance() {
 
         if (!error) {
             setAmountPaid(val);
+            setInputValue('');
             setSaveSuccess(true);
             setTimeout(() => setSaveSuccess(false), 3000);
         } else {
@@ -231,21 +234,27 @@ export default function Balance() {
                                     </div>
                                 ) : (
                                     <div className="mt-1">
+                                        {Number(amountPaid) > 0 && (
+                                            <div className="mb-3">
+                                                <p className="text-xs text-emerald-700 font-semibold uppercase tracking-wider mb-0.5">Total Paid So Far</p>
+                                                <p className="text-2xl font-bold text-gray-900">₹{Number(amountPaid).toLocaleString()}</p>
+                                            </div>
+                                        )}
                                         <div className="flex items-center gap-2 bg-white border border-emerald-200 rounded-xl px-3 py-2.5 shadow-sm focus-within:ring-2 focus-within:ring-emerald-300 transition-all">
                                             <IndianRupee className="w-4 h-4 text-emerald-500 shrink-0" />
                                             <input
                                                 type="number"
                                                 min="0"
-                                                placeholder="0"
+                                                placeholder="Add new payment..."
                                                 value={inputValue}
                                                 onChange={(e) => setInputValue(e.target.value)}
-                                                className="w-full text-lg font-semibold text-gray-900 outline-none bg-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                className="w-full text-lg font-semibold text-gray-900 outline-none bg-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none placeholder:text-gray-400 placeholder:text-base placeholder:font-medium"
                                                 id="amount-paid-input"
                                             />
                                         </div>
                                         <Button
                                             onClick={handleSave}
-                                            disabled={saving || inputValue === '' || Number(inputValue) < 0}
+                                            disabled={saving || inputValue === '' || Number(inputValue) <= 0}
                                             className="w-full mt-3 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium h-9"
                                         >
                                             {saving
