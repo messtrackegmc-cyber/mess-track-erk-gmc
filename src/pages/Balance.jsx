@@ -121,7 +121,7 @@ export default function Balance() {
 
     const handleSave = async () => {
         const val = newPayment + currentTotalPaid;
-        if (isNaN(newPayment) || newPayment <= 0) return;
+        if (isNaN(newPayment) || newPayment <= 0 || val > messBill) return;
 
         setSaving(true);
         const { error } = await supabase
@@ -245,6 +245,7 @@ export default function Balance() {
                                             <input
                                                 type="number"
                                                 min="0"
+                                                max={messBill - currentTotalPaid}
                                                 placeholder="Add new payment..."
                                                 value={inputValue}
                                                 onChange={(e) => setInputValue(e.target.value)}
@@ -254,7 +255,7 @@ export default function Balance() {
                                         </div>
                                         <Button
                                             onClick={handleSave}
-                                            disabled={saving || inputValue === '' || Number(inputValue) <= 0}
+                                            disabled={saving || inputValue === '' || Number(inputValue) <= 0 || balance < 0}
                                             className="w-full mt-3 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium h-9"
                                         >
                                             {saving
@@ -264,10 +265,17 @@ export default function Balance() {
                                                     : 'Save Amount'
                                             }
                                         </Button>
-                                        <p className="text-xs text-emerald-600 mt-2 flex items-center gap-1">
-                                            <AlertCircle className="w-3 h-3 shrink-0" />
-                                            You can update this until verified by admin.
-                                        </p>
+                                        {balance < 0 ? (
+                                            <p className="text-xs text-red-600 mt-2 flex items-center gap-1">
+                                                <AlertCircle className="w-3 h-3 shrink-0" />
+                                                Payment exceeds total bill.
+                                            </p>
+                                        ) : (
+                                            <p className="text-xs text-emerald-600 mt-2 flex items-center gap-1">
+                                                <AlertCircle className="w-3 h-3 shrink-0" />
+                                                You can update this until verified by admin.
+                                            </p>
+                                        )}
                                     </div>
                                 )}
                             </CardContent>
