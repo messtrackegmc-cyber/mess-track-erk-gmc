@@ -142,7 +142,6 @@ export default function AdminGpay() {
                 month: monthKey,
                 amount_paid: current.amount_paid,
                 is_paid: newIsPaid,
-                is_locked: true,
             }, {
                 onConflict: 'hostel_id,mess_number,month',
                 ignoreDuplicates: false,
