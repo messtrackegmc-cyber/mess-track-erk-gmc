@@ -82,7 +82,7 @@ export default function Balance() {
             setSaveSuccess(false);
             const { data, error } = await supabase
                 .from('gpay_payments')
-                .select('amount_paid, is_locked')
+                .select('amount_paid, is_paid')
                 .eq('hostel_id', user.hostelId)
                 .eq('mess_number', user.messNumber)
                 .eq('month', monthKey)
@@ -95,7 +95,7 @@ export default function Balance() {
             if (data) {
                 setAmountPaid(data.amount_paid ?? 0);
                 setInputValue(String(data.amount_paid ?? ''));
-                setIsLocked(data.is_locked ?? false);
+                setIsLocked(data.is_paid ?? false);
             } else {
                 setAmountPaid('');
                 setInputValue('');
@@ -129,8 +129,6 @@ export default function Balance() {
                 mess_number: user.messNumber,
                 month: monthKey,
                 amount_paid: val,
-                is_locked: true,
-                is_paid: false,
             }, {
                 onConflict: 'hostel_id,mess_number,month',
                 ignoreDuplicates: false,
@@ -138,7 +136,6 @@ export default function Balance() {
 
         if (!error) {
             setAmountPaid(val);
-            setIsLocked(true);
             setSaveSuccess(true);
             setTimeout(() => setSaveSuccess(false), 3000);
         } else {
@@ -229,7 +226,7 @@ export default function Balance() {
                                         </p>
                                         <div className="flex items-center gap-1.5 mt-3">
                                             <Lock className="w-3 h-3 text-emerald-600" />
-                                            <p className="text-xs text-emerald-600 font-medium">Submitted &amp; locked</p>
+                                            <p className="text-xs text-emerald-600 font-medium">Payment verified & locked</p>
                                         </div>
                                     </div>
                                 ) : (
@@ -258,9 +255,9 @@ export default function Balance() {
                                                     : 'Save Amount'
                                             }
                                         </Button>
-                                        <p className="text-xs text-amber-600 mt-2 flex items-center gap-1">
+                                        <p className="text-xs text-emerald-600 mt-2 flex items-center gap-1">
                                             <AlertCircle className="w-3 h-3 shrink-0" />
-                                            Once saved, this cannot be edited.
+                                            You can update this until verified by admin.
                                         </p>
                                     </div>
                                 )}
