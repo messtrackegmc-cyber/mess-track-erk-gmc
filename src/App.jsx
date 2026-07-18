@@ -12,6 +12,8 @@ import ManageLeaves from './pages/ManageLeaves';
 import AdminBills from './pages/AdminBills';
 import AdminSettings from './pages/AdminSettings';
 import LeaveTillJoinList from './pages/LeaveTillJoinList';
+import Balance from './pages/Balance';
+import AdminGpay from './pages/AdminGpay';
 import ProtectedRoute from './components/ProtectedRoute';
 import DashboardLayout from './layouts/DashboardLayout';
 import AdminLayout from './layouts/AdminLayout';
@@ -35,6 +37,7 @@ export default function App() {
                 <Route path="menu" element={<MessMenu />} />
                 <Route path="leave" element={<LeaveSelection />} />
                 <Route path="bill" element={<MessBill />} />
+                <Route path="balance" element={<Balance />} />
                 <Route path="profile" element={<Profile />} />
             </Route>
 
@@ -53,6 +56,7 @@ export default function App() {
                 <Route path="students" element={<ManageStudents />} />
                 <Route path="leaves" element={<ManageLeaves />} />
                 <Route path="bills" element={<AdminBills />} />
+                <Route path="gpay" element={<AdminGpay />} />
                 <Route path="settings" element={<AdminSettings />} />
                 <Route path="ltj-list" element={<LeaveTillJoinList />} />
             </Route>

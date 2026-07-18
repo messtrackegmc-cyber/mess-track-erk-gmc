@@ -9,7 +9,8 @@ import {
     FileSpreadsheet,
     Settings,
     CalendarCheck,
-    Calendar
+    Calendar,
+    IndianRupee,
 } from 'lucide-react';
 import { Separator } from './ui/separator';
 import { Logo } from './Logo';
@@ -22,6 +23,7 @@ const navItems = [
     { to: '/admin/leaves', label: 'Leave Reports', icon: Bell },
     { to: '/admin/ltj-list', label: 'Leave Till Join List', icon: CalendarCheck },
     { to: '/admin/bills', label: 'Finance', icon: FileSpreadsheet },
+    { to: '/admin/gpay', label: 'GPay', icon: IndianRupee },
     { to: '/admin/settings', label: 'Settings', icon: Settings },
 ];
 
