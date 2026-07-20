@@ -11,6 +11,7 @@ import {
     CalendarCheck,
     Calendar,
     IndianRupee,
+    CalendarClock,
 } from 'lucide-react';
 import { Separator } from './ui/separator';
 import { Logo } from './Logo';
@@ -21,6 +22,7 @@ const navItems = [
     { to: '/admin/menu', label: 'Manage Menu', icon: UtensilsCrossed },
     { to: '/admin/students', label: 'Students', icon: Users },
     { to: '/admin/leaves', label: 'Leave Reports', icon: Bell },
+    { to: '/admin/bulk-leave', label: 'Bulk Leave', icon: CalendarClock },
     { to: '/admin/ltj-list', label: 'Leave Till Join List', icon: CalendarCheck },
     { to: '/admin/bills', label: 'Finance', icon: FileSpreadsheet },
     { to: '/admin/gpay', label: 'GPay', icon: IndianRupee },

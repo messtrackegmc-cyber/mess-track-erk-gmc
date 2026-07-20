@@ -14,6 +14,7 @@ import AdminSettings from './pages/AdminSettings';
 import LeaveTillJoinList from './pages/LeaveTillJoinList';
 import Balance from './pages/Balance';
 import AdminGpay from './pages/AdminGpay';
+import BulkLeave from './pages/BulkLeave';
 import ProtectedRoute from './components/ProtectedRoute';
 import DashboardLayout from './layouts/DashboardLayout';
 import AdminLayout from './layouts/AdminLayout';
@@ -59,6 +60,7 @@ export default function App() {
                 <Route path="gpay" element={<AdminGpay />} />
                 <Route path="settings" element={<AdminSettings />} />
                 <Route path="ltj-list" element={<LeaveTillJoinList />} />
+                <Route path="bulk-leave" element={<BulkLeave />} />
             </Route>
         </Routes>
     );
