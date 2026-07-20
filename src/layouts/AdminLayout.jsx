@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import AdminSidebar from '../components/AdminSidebar';
 import MobileNav from '../components/MobileNav';
-import { Bell, LayoutDashboard, UtensilsCrossed, Users, Menu, FileSpreadsheet, Settings, CalendarCheck, Calendar, IndianRupee } from 'lucide-react';
+import { Bell, LayoutDashboard, UtensilsCrossed, Users, Menu, FileSpreadsheet, Settings, CalendarCheck, Calendar, IndianRupee, CalendarClock } from 'lucide-react';
 import { Button } from '../components/ui/button';
 
 export default function AdminLayout() {
@@ -14,6 +14,7 @@ export default function AdminLayout() {
         { to: '/admin/menu', label: 'Manage Menu', icon: UtensilsCrossed },
         { to: '/admin/students', label: 'Students', icon: Users },
         { to: '/admin/leaves', label: 'Leave Reports', icon: Bell },
+        { to: '/admin/bulk-leave', label: 'Bulk Leave', icon: CalendarClock },
         { to: '/admin/ltj-list', label: 'Leave Till Join List', icon: CalendarCheck },
         { to: '/admin/bills', label: 'Finance', icon: FileSpreadsheet },
         { to: '/admin/gpay', label: 'GPay', icon: IndianRupee },
