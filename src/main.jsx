@@ -12,8 +12,32 @@ import { registerSW } from 'virtual:pwa-register'
 
 import { MenuProvider } from './context/MenuContext'
 
-// Register PWA service worker with autoUpdate
-registerSW({ immediate: true })
+// Register PWA service worker with autoUpdate and reload handling
+registerSW({
+  immediate: true,
+  onRegisteredSW(swUrl, registration) {
+    // Periodic update checks
+    if (registration) {
+      setInterval(() => {
+        registration.update()
+      }, 60 * 1000)
+    }
+  },
+  onNeedRefresh() {
+    // Prompt reload when a new SW is waiting
+    window.location.reload()
+  },
+  onOfflineReady() {
+    console.log('App ready for offline use')
+  },
+})
+
+// Force reload when a new service worker takes control
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    window.location.reload()
+  })
+}
 
 createRoot(document.getElementById('root')).render(
     <StrictMode>
