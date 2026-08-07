@@ -14,19 +14,38 @@ export default function AdminMealFeed() {
     const [loading, setLoading] = useState(true);
     const [isRefreshing, setIsRefreshing] = useState(false);
 
+    const [studentMap, setStudentMap] = useState({});
+
     const fetchClaims = async (showToast = false) => {
         if (showToast) setIsRefreshing(true);
         try {
             const today = new Date().toLocaleDateString('en-CA');
-            const { data, error } = await supabase
+            
+            // 1. Fetch claims for today
+            const { data: claimsData, error: claimsError } = await supabase
                 .from('meal_claims')
                 .select('*')
                 .eq('hostel_id', user?.hostelId)
                 .eq('claim_date', today)
                 .order('claimed_at', { ascending: false });
 
-            if (error) throw error;
-            setClaims(data || []);
+            if (claimsError) throw claimsError;
+
+            // 2. Fetch student list to map student names & mess numbers accurately
+            const { data: studentsData } = await supabase
+                .from('students')
+                .select('id, name, mess_number')
+                .eq('hostel_id', user?.hostelId);
+
+            if (studentsData) {
+                const map = {};
+                studentsData.forEach(s => {
+                    map[s.id] = s;
+                });
+                setStudentMap(map);
+            }
+
+            setClaims(claimsData || []);
             if (showToast) toast.success('Feed refreshed');
         } catch (err) {
             console.error('Error fetching claims:', err);
@@ -65,9 +84,9 @@ export default function AdminMealFeed() {
         year: 'numeric'
     });
 
-    const breakfastCount = claims.filter(c => c.meal_type === 'breakfast').length;
-    const lunchCount = claims.filter(c => c.meal_type === 'lunch').length;
-    const dinnerCount = claims.filter(c => c.meal_type === 'dinner').length;
+    const breakfastCount = claims.filter(c => c.meal_type?.toLowerCase() === 'breakfast').length;
+    const lunchCount = claims.filter(c => c.meal_type?.toLowerCase() === 'lunch').length;
+    const dinnerCount = claims.filter(c => c.meal_type?.toLowerCase() === 'dinner').length;
 
     const formatTime = (isoString) => {
         return new Date(isoString).toLocaleTimeString('en-US', {
@@ -78,7 +97,8 @@ export default function AdminMealFeed() {
     };
 
     const getMealBadge = (mealType) => {
-        switch (mealType) {
+        const type = mealType?.toLowerCase();
+        switch (type) {
             case 'breakfast':
                 return <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200 border-none font-medium">Breakfast</Badge>;
             case 'lunch':
@@ -186,18 +206,23 @@ export default function AdminMealFeed() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
-                                {claims.map((claim, index) => (
-                                    <tr key={claim.id} className="hover:bg-gray-50/50 transition-colors">
-                                        <td className="px-6 py-4 text-gray-400">{claims.length - index}</td>
-                                        <td className="px-6 py-4 font-medium text-gray-900">{claim.student_mess_no || '-'}</td>
-                                        <td className="px-6 py-4 text-gray-700">{claim.student_name || 'Unknown'}</td>
-                                        <td className="px-6 py-4">{getMealBadge(claim.meal_type)}</td>
-                                        <td className="px-6 py-4 text-gray-500 flex items-center gap-1.5">
-                                            <Clock className="w-3.5 h-3.5 text-gray-400" />
-                                            {formatTime(claim.claimed_at)}
-                                        </td>
-                                    </tr>
-                                ))}
+                                {claims.map((claim, index) => {
+                                    const student = studentMap[claim.student_id] || {};
+                                    const messNumber = claim.mess_number || student.mess_number || claim.student_mess_no || '-';
+                                    const studentName = student.name || claim.student_name || 'Unknown';
+                                    return (
+                                        <tr key={claim.id} className="hover:bg-gray-50/50 transition-colors">
+                                            <td className="px-6 py-4 text-gray-400">{claims.length - index}</td>
+                                            <td className="px-6 py-4 font-medium text-gray-900">{messNumber}</td>
+                                            <td className="px-6 py-4 text-gray-700">{studentName}</td>
+                                            <td className="px-6 py-4">{getMealBadge(claim.meal_type)}</td>
+                                            <td className="px-6 py-4 text-gray-500 flex items-center gap-1.5">
+                                                <Clock className="w-3.5 h-3.5 text-gray-400" />
+                                                {formatTime(claim.claimed_at)}
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
                     )}
