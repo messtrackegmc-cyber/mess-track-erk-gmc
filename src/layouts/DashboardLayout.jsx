@@ -3,13 +3,14 @@ import { Outlet } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import MobileNav from '../components/MobileNav';
-import { LayoutDashboard, UtensilsCrossed, CalendarOff, Receipt, User, Wallet } from 'lucide-react';
+import { LayoutDashboard, UtensilsCrossed, CalendarOff, Receipt, User, Wallet, QrCode } from 'lucide-react';
 
 export default function DashboardLayout() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     const navItems = [
         { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+        { to: '/dashboard/scan', label: 'Scan to Eat', icon: QrCode },
         { to: '/dashboard/menu', label: 'Mess Menu', icon: UtensilsCrossed },
         { to: '/dashboard/leave', label: 'Leave', icon: CalendarOff },
         { to: '/dashboard/bill', label: 'Mess Bill', icon: Receipt },

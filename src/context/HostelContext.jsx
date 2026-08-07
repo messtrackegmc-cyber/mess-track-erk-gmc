@@ -4,6 +4,13 @@ import { useAuth } from './AuthContext';
 
 const HostelContext = createContext(null);
 
+// Default meal time windows
+const DEFAULT_MEAL_WINDOWS = {
+    breakfast: { start: '07:00', end: '10:00' },
+    lunch: { start: '12:00', end: '15:00' },
+    dinner: { start: '19:00', end: '22:00' },
+};
+
 export function HostelProvider({ children }) {
     const { user } = useAuth();
     const [hostelSettings, setHostelSettings] = useState({
@@ -11,6 +18,7 @@ export function HostelProvider({ children }) {
         cutoffTime: 20, // Default fallback (8 PM)
         hostelName: '',
         maxLeaves: 10, // Default fallback (null = unlimited)
+        mealWindows: DEFAULT_MEAL_WINDOWS,
         loading: true,
     });
 
@@ -24,7 +32,7 @@ export function HostelProvider({ children }) {
             try {
                 const { data, error } = await supabase
                     .from('hostels')
-                    .select('name, mess_rate, cutoff_time')
+                    .select('name, mess_rate, cutoff_time, breakfast_start, breakfast_end, lunch_start, lunch_end, dinner_start, dinner_end')
                     .eq('id', user.hostelId)
                     .single();
 
@@ -41,6 +49,20 @@ export function HostelProvider({ children }) {
                         cutoffTime: data.cutoff_time,
                         hostelName: data.name,
                         maxLeaves: null, // Hardcoded to unlimited leaves
+                        mealWindows: {
+                            breakfast: {
+                                start: data.breakfast_start || '07:00',
+                                end: data.breakfast_end || '10:00',
+                            },
+                            lunch: {
+                                start: data.lunch_start || '12:00',
+                                end: data.lunch_end || '15:00',
+                            },
+                            dinner: {
+                                start: data.dinner_start || '19:00',
+                                end: data.dinner_end || '22:00',
+                            },
+                        },
                         loading: false,
                     });
                 }
@@ -58,12 +80,25 @@ export function HostelProvider({ children }) {
         if (!user?.hostelId) return { success: false, error: 'No hostel ID found for user' };
 
         try {
+            // Build the update payload
+            const updatePayload = {
+                mess_rate: newSettings.messRate,
+                cutoff_time: newSettings.cutoffTime,
+            };
+
+            // Include meal window updates if provided
+            if (newSettings.mealWindows) {
+                updatePayload.breakfast_start = newSettings.mealWindows.breakfast.start;
+                updatePayload.breakfast_end = newSettings.mealWindows.breakfast.end;
+                updatePayload.lunch_start = newSettings.mealWindows.lunch.start;
+                updatePayload.lunch_end = newSettings.mealWindows.lunch.end;
+                updatePayload.dinner_start = newSettings.mealWindows.dinner.start;
+                updatePayload.dinner_end = newSettings.mealWindows.dinner.end;
+            }
+
             const { error } = await supabase
                 .from('hostels')
-                .update({
-                    mess_rate: newSettings.messRate,
-                    cutoff_time: newSettings.cutoffTime,
-                })
+                .update(updatePayload)
                 .eq('id', user.hostelId);
 
             if (error) throw error;
@@ -73,6 +108,7 @@ export function HostelProvider({ children }) {
                 ...prev,
                 messRate: newSettings.messRate,
                 cutoffTime: newSettings.cutoffTime,
+                ...(newSettings.mealWindows && { mealWindows: newSettings.mealWindows }),
             }));
 
             return { success: true };

@@ -9,10 +9,12 @@ import {
     ChefHat,
     User,
     Wallet,
+    QrCode,
 } from 'lucide-react';
 
 const navItems = [
     { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { to: '/dashboard/scan', label: 'Scan to Eat', icon: QrCode },
     { to: '/dashboard/menu', label: 'Mess Menu', icon: UtensilsCrossed },
     { to: '/dashboard/leave', label: 'Leave', icon: CalendarOff },
     { to: '/dashboard/bill', label: 'Mess Bill', icon: Receipt },

@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLeaves } from '../context/LeaveContext';
-import { UtensilsCrossed, CalendarOff, Receipt, ArrowRight } from 'lucide-react';
+import { UtensilsCrossed, CalendarOff, Receipt, ArrowRight, QrCode } from 'lucide-react';
 import { Card, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 
@@ -14,6 +14,15 @@ export default function Dashboard() {
     const isOnLeaveToday = user?.messNumber ? isStudentOnLeave(user.messNumber, today) : false;
 
     const actions = [
+        {
+            title: 'Scan to Eat',
+            description: 'Scan the counter QR code to claim your meal.',
+            icon: QrCode,
+            path: '/dashboard/scan',
+            color: 'text-indigo-600',
+            bg: 'bg-indigo-50',
+            border: 'hover:border-indigo-200',
+        },
         {
             title: 'View Weekly Menu',
             description: 'Check breakfast, lunch, and dinner menus for the entire week.',

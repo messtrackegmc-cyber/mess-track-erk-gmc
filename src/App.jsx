@@ -15,6 +15,9 @@ import LeaveTillJoinList from './pages/LeaveTillJoinList';
 import Balance from './pages/Balance';
 import AdminGpay from './pages/AdminGpay';
 import BulkLeave from './pages/BulkLeave';
+import ClaimMeal from './pages/ClaimMeal';
+import ScanMeal from './pages/ScanMeal';
+import AdminMealFeed from './pages/AdminMealFeed';
 import ProtectedRoute from './components/ProtectedRoute';
 import DashboardLayout from './layouts/DashboardLayout';
 import AdminLayout from './layouts/AdminLayout';
@@ -24,6 +27,16 @@ export default function App() {
         <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/" element={<Navigate to="/login" replace />} />
+
+            {/* Standalone Protected Routes */}
+            <Route
+                path="/claim-meal"
+                element={
+                    <ProtectedRoute requiredRole="user">
+                        <ClaimMeal />
+                    </ProtectedRoute>
+                }
+            />
 
             {/* User Routes */}
             <Route
@@ -35,6 +48,7 @@ export default function App() {
                 }
             >
                 <Route index element={<Dashboard />} />
+                <Route path="scan" element={<ScanMeal />} />
                 <Route path="menu" element={<MessMenu />} />
                 <Route path="leave" element={<LeaveSelection />} />
                 <Route path="bill" element={<MessBill />} />
@@ -53,6 +67,7 @@ export default function App() {
             >
                 <Route index element={<AdminDashboard />} />
                 <Route path="tomorrow" element={<AdminDashboard showTomorrow={true} />} />
+                <Route path="meal-feed" element={<AdminMealFeed />} />
                 <Route path="menu" element={<ManageMenu />} />
                 <Route path="students" element={<ManageStudents />} />
                 <Route path="leaves" element={<ManageLeaves />} />

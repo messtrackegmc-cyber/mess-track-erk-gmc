@@ -2,23 +2,41 @@ import { useState, useEffect } from 'react';
 import { useHostel } from '../context/HostelContext';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
-import { Save, Settings, DatabaseBackup, Download } from 'lucide-react';
+import { Save, Settings, DatabaseBackup, Download, Clock, Coffee, Sun, Moon, QrCode } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 import { supabase } from '../lib/supabaseClient';
+import { useAuth } from '../context/AuthContext';
 
 export default function AdminSettings() {
-    const { messRate, cutoffTime, hostelName, updateSettings, loading } = useHostel();
+    const { messRate, cutoffTime, mealWindows, hostelName, updateSettings, loading } = useHostel();
+    const { user } = useAuth();
 
     const [rate, setRate] = useState(messRate);
     const [cutoff, setCutoff] = useState(cutoffTime);
     const [isSaving, setIsSaving] = useState(false);
     const [isBackingUp, setIsBackingUp] = useState(false);
 
+    // Meal windows states
+    const [breakfastStart, setBreakfastStart] = useState(mealWindows?.breakfast?.start || '07:30');
+    const [breakfastEnd, setBreakfastEnd] = useState(mealWindows?.breakfast?.end || '09:00');
+    const [lunchStart, setLunchStart] = useState(mealWindows?.lunch?.start || '12:30');
+    const [lunchEnd, setLunchEnd] = useState(mealWindows?.lunch?.end || '14:00');
+    const [dinnerStart, setDinnerStart] = useState(mealWindows?.dinner?.start || '19:30');
+    const [dinnerEnd, setDinnerEnd] = useState(mealWindows?.dinner?.end || '21:00');
+
     // Sync state when context loads
     useEffect(() => {
         setRate(messRate);
         setCutoff(cutoffTime);
-    }, [messRate, cutoffTime]);
+        if (mealWindows) {
+            setBreakfastStart(mealWindows.breakfast?.start || '07:30');
+            setBreakfastEnd(mealWindows.breakfast?.end || '09:00');
+            setLunchStart(mealWindows.lunch?.start || '12:30');
+            setLunchEnd(mealWindows.lunch?.end || '14:00');
+            setDinnerStart(mealWindows.dinner?.start || '19:30');
+            setDinnerEnd(mealWindows.dinner?.end || '21:00');
+        }
+    }, [messRate, cutoffTime, mealWindows]);
 
     const handleSave = async (e) => {
         e.preventDefault();
@@ -36,6 +54,11 @@ export default function AdminSettings() {
         const result = await updateSettings({
             messRate: parsedRate,
             cutoffTime: parsedCutoff,
+            mealWindows: {
+                breakfast: { start: breakfastStart, end: breakfastEnd },
+                lunch: { start: lunchStart, end: lunchEnd },
+                dinner: { start: dinnerStart, end: dinnerEnd }
+            }
         });
 
         if (result.success) {
@@ -199,6 +222,149 @@ export default function AdminSettings() {
                             <Download className="w-4 h-4 mr-2" />
                             {isBackingUp ? 'Exporting...' : 'Download Backup'}
                         </Button>
+                    </div>
+                </CardContent>
+            </Card>
+
+            {/* Meal Time Windows Section */}
+            <Card className="border-gray-200 shadow-sm overflow-hidden">
+                <CardHeader className="bg-violet-50 border-b border-violet-100 p-6">
+                    <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-lg bg-white flex items-center justify-center shrink-0">
+                            <Clock className="w-4 h-4 text-violet-600" />
+                        </div>
+                        <div>
+                            <CardTitle className="text-lg">Meal Time Windows</CardTitle>
+                            <CardDescription className="mt-0.5 text-violet-600/80">Configure when each meal is served. Students can only claim meals during these windows.</CardDescription>
+                        </div>
+                    </div>
+                </CardHeader>
+                <CardContent className="p-6 pt-6">
+                    <form onSubmit={handleSave} className="space-y-6">
+                        {/* Breakfast */}
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div className="flex items-center gap-2">
+                                <Coffee className="w-5 h-5 text-blue-500" />
+                                <span className="font-medium text-gray-700">Breakfast</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <input type="time" value={breakfastStart} onChange={e => setBreakfastStart(e.target.value)} className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20" />
+                                <span className="text-gray-400 text-sm">to</span>
+                                <input type="time" value={breakfastEnd} onChange={e => setBreakfastEnd(e.target.value)} className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20" />
+                            </div>
+                        </div>
+                        
+                        <div className="border-t border-gray-100" />
+
+                        {/* Lunch */}
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div className="flex items-center gap-2">
+                                <Sun className="w-5 h-5 text-amber-500" />
+                                <span className="font-medium text-gray-700">Lunch</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <input type="time" value={lunchStart} onChange={e => setLunchStart(e.target.value)} className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20" />
+                                <span className="text-gray-400 text-sm">to</span>
+                                <input type="time" value={lunchEnd} onChange={e => setLunchEnd(e.target.value)} className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20" />
+                            </div>
+                        </div>
+
+                        <div className="border-t border-gray-100" />
+
+                        {/* Dinner */}
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div className="flex items-center gap-2">
+                                <Moon className="w-5 h-5 text-indigo-500" />
+                                <span className="font-medium text-gray-700">Dinner</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <input type="time" value={dinnerStart} onChange={e => setDinnerStart(e.target.value)} className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20" />
+                                <span className="text-gray-400 text-sm">to</span>
+                                <input type="time" value={dinnerEnd} onChange={e => setDinnerEnd(e.target.value)} className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20" />
+                            </div>
+                        </div>
+
+                        <div className="flex justify-end pt-4">
+                            <Button type="submit" disabled={isSaving} className="gap-2">
+                                <Save className="w-4 h-4" />
+                                {isSaving ? 'Saving...' : 'Save Settings'}
+                            </Button>
+                        </div>
+                    </form>
+                </CardContent>
+            </Card>
+
+            {/* QR Code Section */}
+            <Card className="border-gray-200 shadow-sm overflow-hidden">
+                <CardHeader className="bg-cyan-50 border-b border-cyan-100 p-6">
+                    <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-lg bg-white flex items-center justify-center shrink-0">
+                            <QrCode className="w-4 h-4 text-cyan-600" />
+                        </div>
+                        <div>
+                            <CardTitle className="text-lg">Meal Check-in QR Code</CardTitle>
+                            <CardDescription className="mt-0.5 text-cyan-700/80">Print this QR code and place it at the mess counter. Students scan it to claim their meals.</CardDescription>
+                        </div>
+                    </div>
+                </CardHeader>
+                <CardContent className="p-6 pt-6">
+                    <div className="flex flex-col items-center justify-center space-y-6">
+                        <div className="p-4 bg-white border border-gray-100 shadow-sm rounded-2xl">
+                            {user?.hostelId && (
+                                <img 
+                                    src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(`${window.location.origin}/claim-meal?hostel=${user.hostelId}`)}`} 
+                                    alt="Check-in QR Code" 
+                                    className="w-48 h-48"
+                                />
+                            )}
+                        </div>
+                        
+                        <div className="w-full max-w-sm space-y-3">
+                            <div className="p-3 bg-gray-50 rounded-lg border border-gray-200 text-center break-all text-sm text-gray-600 font-mono">
+                                {user?.hostelId ? `${window.location.origin}/claim-meal?hostel=${user.hostelId}` : 'Loading URL...'}
+                            </div>
+                            
+                            <div className="flex gap-2 w-full">
+                                <Button 
+                                    variant="outline" 
+                                    className="flex-1"
+                                    onClick={() => {
+                                        if (user?.hostelId) {
+                                            navigator.clipboard.writeText(`${window.location.origin}/claim-meal?hostel=${user.hostelId}`);
+                                            toast.success('URL copied to clipboard!');
+                                        }
+                                    }}
+                                >
+                                    Copy URL
+                                </Button>
+                                <Button 
+                                    className="flex-1 bg-cyan-600 hover:bg-cyan-700"
+                                    onClick={() => {
+                                        if (!user?.hostelId) return;
+                                        const checkInUrl = `${window.location.origin}/claim-meal?hostel=${user.hostelId}`;
+                                        const printWindow = window.open('', '_blank');
+                                        printWindow.document.write(`
+                                            <html>
+                                            <head><title>Mess Check-in QR</title></head>
+                                            <body style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:sans-serif;margin:0;padding:2rem;text-align:center;">
+                                                <h1 style="font-size:2.5rem;margin-bottom:1rem;color:#111827;">Scan to Claim Your Meal</h1>
+                                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(checkInUrl)}" style="width:400px;height:400px;margin:2rem 0;border:1rem solid white;box-shadow:0 0 20px rgba(0,0,0,0.1);border-radius:1rem;" />
+                                                <p style="margin-top:1.5rem;font-size:1.25rem;color:#4B5563;">Open your Mess Track-E app and scan this code</p>
+                                                <p style="margin-top:1rem;font-size:1rem;color:#9CA3AF;font-weight:bold;">${hostelName || 'Hostel Mess'}</p>
+                                            </body>
+                                            </html>
+                                        `);
+                                        printWindow.document.close();
+                                        // Give the image a moment to load before printing
+                                        setTimeout(() => {
+                                            printWindow.print();
+                                        }, 500);
+                                    }}
+                                >
+                                    Print QR Poster
+                                </Button>
+                            </div>
+                        </div>
                     </div>
                 </CardContent>
             </Card>
