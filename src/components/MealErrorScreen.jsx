@@ -4,6 +4,13 @@ import { XCircle } from 'lucide-react';
 export default function MealErrorScreen({ errorMessage, mealType }) {
   const navigate = useNavigate();
 
+  const handleTryAgain = () => {
+    // Hard reload — bypasses PWA cache and resets hasClaimed ref in ClaimMeal
+    const currentUrl = window.location.href;
+    // Force a clean navigation to the same URL
+    window.location.replace(currentUrl);
+  };
+
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-br from-red-500 via-red-600 to-rose-700 p-6 text-center">
       <div className="relative z-10 flex flex-col items-center space-y-8 max-w-md w-full">
@@ -26,7 +33,7 @@ export default function MealErrorScreen({ errorMessage, mealType }) {
 
         <div className="flex flex-row gap-4 pt-6 w-full justify-center">
           <button
-            onClick={() => window.location.reload()}
+            onClick={handleTryAgain}
             className="flex-1 bg-white/20 backdrop-blur-sm text-white border border-white/30 rounded-xl px-6 py-3 font-semibold hover:bg-white/30 transition-colors shadow-sm"
           >
             Try Again

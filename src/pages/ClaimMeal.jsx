@@ -12,7 +12,7 @@ export default function ClaimMeal() {
   const [searchParams] = useSearchParams();
   const { user } = useAuth();
   const { loading: hostelLoading, mealWindows } = useHostel();
-  const { isStudentOnLeave } = useLeaves();
+  const { isStudentOnLeave, loading: leavesLoading } = useLeaves();
 
   const [status, setStatus] = useState('loading'); // 'loading' | 'success' | 'error'
   const [errorMessage, setErrorMessage] = useState('');
@@ -24,7 +24,11 @@ export default function ClaimMeal() {
 
   useEffect(() => {
     const claimMeal = async () => {
-      if (hasClaimed.current || hostelLoading || !user) return;
+      // Wait for ALL contexts to finish loading before attempting claim
+      if (hostelLoading || leavesLoading || !user) return;
+      
+      // Prevent double execution
+      if (hasClaimed.current) return;
       hasClaimed.current = true;
 
       try {
@@ -42,6 +46,7 @@ export default function ClaimMeal() {
           return;
         }
 
+        // Detect current meal window
         const now = new Date();
         const currentTime = now.toTimeString().slice(0, 5);
         let detectedMeal = null;
@@ -64,6 +69,7 @@ export default function ClaimMeal() {
 
         setMealType(detectedMeal);
 
+        // Check if student is on leave today
         const today = new Date().toLocaleDateString('en-CA');
         const onLeave = isStudentOnLeave(user.messNumber, today);
         
@@ -73,6 +79,7 @@ export default function ClaimMeal() {
           return;
         }
 
+        // Attempt to claim the meal
         const { error } = await supabase.from('meal_claims').insert([{
           student_id: user.id,
           mess_number: user.messNumber,
@@ -102,7 +109,7 @@ export default function ClaimMeal() {
     };
 
     claimMeal();
-  }, [user, hostelLoading, mealWindows, isStudentOnLeave, searchParams]);
+  }, [user, hostelLoading, leavesLoading, mealWindows, isStudentOnLeave, searchParams]);
 
   if (status === 'loading') {
     return (
