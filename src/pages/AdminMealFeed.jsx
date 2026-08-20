@@ -141,6 +141,12 @@ export default function AdminMealFeed() {
                         <div>
                             <p className="text-sm font-medium text-gray-500">Breakfast</p>
                             <h3 className="text-2xl font-bold text-gray-900">{loading ? '-' : breakfastCount}</h3>
+                            {!loading && breakfastCount > 0 && (
+                                <div className="flex items-center gap-1.5 mt-1.5">
+                                    <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold">♂ {claims.filter(c => c.meal_type?.toLowerCase() === 'breakfast' && c.mess_number?.toUpperCase().startsWith('M')).length}M</span>
+                                    <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-pink-50 text-pink-600 text-xs font-semibold">♀ {claims.filter(c => c.meal_type?.toLowerCase() === 'breakfast' && c.mess_number?.toUpperCase().startsWith('F')).length}F</span>
+                                </div>
+                            )}
                         </div>
                     </CardContent>
                 </Card>
@@ -153,6 +159,12 @@ export default function AdminMealFeed() {
                         <div>
                             <p className="text-sm font-medium text-gray-500">Lunch</p>
                             <h3 className="text-2xl font-bold text-gray-900">{loading ? '-' : lunchCount}</h3>
+                            {!loading && lunchCount > 0 && (
+                                <div className="flex items-center gap-1.5 mt-1.5">
+                                    <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold">♂ {claims.filter(c => c.meal_type?.toLowerCase() === 'lunch' && c.mess_number?.toUpperCase().startsWith('M')).length}M</span>
+                                    <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-pink-50 text-pink-600 text-xs font-semibold">♀ {claims.filter(c => c.meal_type?.toLowerCase() === 'lunch' && c.mess_number?.toUpperCase().startsWith('F')).length}F</span>
+                                </div>
+                            )}
                         </div>
                     </CardContent>
                 </Card>
@@ -165,6 +177,12 @@ export default function AdminMealFeed() {
                         <div>
                             <p className="text-sm font-medium text-gray-500">Dinner</p>
                             <h3 className="text-2xl font-bold text-gray-900">{loading ? '-' : dinnerCount}</h3>
+                            {!loading && dinnerCount > 0 && (
+                                <div className="flex items-center gap-1.5 mt-1.5">
+                                    <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold">♂ {claims.filter(c => c.meal_type?.toLowerCase() === 'dinner' && c.mess_number?.toUpperCase().startsWith('M')).length}M</span>
+                                    <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-pink-50 text-pink-600 text-xs font-semibold">♀ {claims.filter(c => c.meal_type?.toLowerCase() === 'dinner' && c.mess_number?.toUpperCase().startsWith('F')).length}F</span>
+                                </div>
+                            )}
                         </div>
                     </CardContent>
                 </Card>
