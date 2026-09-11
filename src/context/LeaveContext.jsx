@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 
@@ -8,6 +8,7 @@ export function LeaveProvider({ children }) {
     const [leaves, setLeaves] = useState({});
     const [loading, setLoading] = useState(true);
     const { user } = useAuth();
+    const fetchIdRef = useRef(0);
 
     useEffect(() => {
         if (user?.hostelId) {
@@ -43,6 +44,7 @@ export function LeaveProvider({ children }) {
 
     const fetchLeaves = async () => {
         if (!user?.hostelId) return;
+        const currentFetchId = ++fetchIdRef.current;
         setLoading(true);
 
         const PAGE_SIZE = 1000;
@@ -72,6 +74,7 @@ export function LeaveProvider({ children }) {
                 .eq('hostel_id', user.hostelId)
                 .gte('leave_date', pastStr)
                 .lte('leave_date', futureStr)
+                .order('id', { ascending: true })
                 .range(from, from + PAGE_SIZE - 1);
 
             // If STUDENT, only fetch OWN leaves
@@ -81,9 +84,14 @@ export function LeaveProvider({ children }) {
 
             const { data, error } = await query;
 
+            // If a newer fetch was initiated, abort this run
+            if (currentFetchId !== fetchIdRef.current) return;
+
             if (error) {
                 console.error('Error fetching leaves:', error);
-                setLoading(false);
+                if (currentFetchId === fetchIdRef.current) {
+                    setLoading(false);
+                }
                 return;
             }
 
@@ -98,6 +106,9 @@ export function LeaveProvider({ children }) {
                 from += PAGE_SIZE;
             }
         }
+
+        // Final check before applying state update
+        if (currentFetchId !== fetchIdRef.current) return;
 
         // Transform records to map: { 'YYYY-MM-DD': [{ messNumber, isAdminGranted }] }
         const leavesMap = {};

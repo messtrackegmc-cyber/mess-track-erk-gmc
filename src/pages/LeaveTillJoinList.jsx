@@ -38,6 +38,7 @@ export default function LeaveTillJoinList() {
                     .eq('status', 'Approved')
                     .eq('is_admin_granted', true)
                     .gte('leave_date', today)
+                    .order('id', { ascending: true })
                     .range(from, from + PAGE_SIZE - 1);
 
                 if (error) throw error;

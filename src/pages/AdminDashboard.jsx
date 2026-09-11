@@ -3,14 +3,15 @@ import { Card, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Skeleton } from '../components/ui/skeleton';
 import { Users, AlertCircle, UtensilsCrossed } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import { useStudents } from '../context/StudentContext';
-import { useLeaves } from '../context/LeaveContext';
+import { supabase } from '../lib/supabaseClient';
 
 export default function AdminDashboard({ showTomorrow = false }) {
+    const { user } = useAuth();
     const { students, loading: studentsLoading } = useStudents();
-    const { getLeavesByDate, loading: leavesLoading } = useLeaves();
-
-    const isLoading = studentsLoading || leavesLoading;
+    const [dayLeaves, setDayLeaves] = useState([]);
+    const [dayLeavesLoading, setDayLeavesLoading] = useState(true);
 
     // Calculate target date (Today or Tomorrow)
     const targetDate = new Date();
@@ -18,15 +19,84 @@ export default function AdminDashboard({ showTomorrow = false }) {
         targetDate.setDate(targetDate.getDate() + 1);
     }
     const dateKey = targetDate.toLocaleDateString('en-CA');
-    const dayLeaves = getLeavesByDate(dateKey) || [];
+
+    useEffect(() => {
+        if (!user?.hostelId) {
+            setDayLeaves([]);
+            setDayLeavesLoading(false);
+            return;
+        }
+
+        let isCancelled = false;
+
+        const fetchDayLeaves = async () => {
+            setDayLeavesLoading(true);
+            try {
+                const { data, error } = await supabase
+                    .from('leaves')
+                    .select('mess_number, is_admin_granted')
+                    .eq('hostel_id', user.hostelId)
+                    .eq('leave_date', dateKey)
+                    .eq('status', 'Approved');
+
+                if (error) throw error;
+                if (!isCancelled) {
+                    setDayLeaves(data || []);
+                }
+            } catch (err) {
+                console.error('Error fetching dashboard leaves for date:', dateKey, err);
+            } finally {
+                if (!isCancelled) {
+                    setDayLeavesLoading(false);
+                }
+            }
+        };
+
+        fetchDayLeaves();
+
+        // Real-time listener for leave changes in this hostel
+        const subscription = supabase
+            .channel(`admin-dashboard-leaves-${dateKey}`)
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'leaves',
+                    filter: `hostel_id=eq.${user.hostelId}`
+                },
+                () => {
+                    fetchDayLeaves();
+                }
+            )
+            .subscribe();
+
+        return () => {
+            isCancelled = true;
+            supabase.removeChannel(subscription);
+        };
+    }, [user?.hostelId, dateKey]);
+
+    const isLoading = studentsLoading || dayLeavesLoading;
 
     const totalStudents = students.length;
     const totalMales = students.filter(s => s.messNumber?.toUpperCase().startsWith('M')).length;
     const totalFemales = students.filter(s => s.messNumber?.toUpperCase().startsWith('F')).length;
 
-    const leavesCount = dayLeaves.length;
-    const leavesMale = dayLeaves.filter(l => l.messNumber?.toUpperCase().startsWith('M')).length;
-    const leavesFemale = dayLeaves.filter(l => l.messNumber?.toUpperCase().startsWith('F')).length;
+    // Deduplicate by mess_number to guarantee accuracy
+    const uniqueDayLeaves = [];
+    const seenMess = new Set();
+    dayLeaves.forEach(l => {
+        const m = l.mess_number || l.messNumber;
+        if (m && !seenMess.has(m)) {
+            seenMess.add(m);
+            uniqueDayLeaves.push(l);
+        }
+    });
+
+    const leavesCount = uniqueDayLeaves.length;
+    const leavesMale = uniqueDayLeaves.filter(l => (l.mess_number || l.messNumber)?.toUpperCase().startsWith('M')).length;
+    const leavesFemale = uniqueDayLeaves.filter(l => (l.mess_number || l.messNumber)?.toUpperCase().startsWith('F')).length;
 
     const activeCount = totalStudents - leavesCount;
     const activeMale = totalMales - leavesMale;

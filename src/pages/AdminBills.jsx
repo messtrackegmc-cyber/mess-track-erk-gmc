@@ -71,6 +71,7 @@ export default function AdminBills() {
                     .eq('hostel_id', user.hostelId)
                     .gte('leave_date', sDate)
                     .lte('leave_date', eDate)
+                    .order('id', { ascending: true })
                     .range(from, from + PAGE_SIZE - 1);
 
                 if (error) {
