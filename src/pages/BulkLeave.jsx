@@ -210,25 +210,37 @@ export default function BulkLeave() {
         let hasError = false;
         let errorMsg = '';
 
-        for (let i = 0; i < records.length; i += BATCH_SIZE) {
-            const batch = records.slice(i, i + BATCH_SIZE);
-            const messNumbersInBatch = [...new Set(batch.map((r) => r.mess_number))];
-
-            // Delete existing first to avoid duplicates
-            await supabase
+        // Delete existing first to avoid duplicates (batch by mess_number)
+        const messNumbers = [...selectedMessNumbers];
+        const MESS_BATCH = 50;
+        for (let i = 0; i < messNumbers.length; i += MESS_BATCH) {
+            const batch = messNumbers.slice(i, i + MESS_BATCH);
+            const { error } = await supabase
                 .from('leaves')
                 .delete()
-                .in('mess_number', messNumbersInBatch)
+                .in('mess_number', batch)
                 .in('leave_date', dates)
                 .eq('hostel_id', user.hostelId);
 
-            const { error } = await supabase.from('leaves').insert(batch);
             if (error) {
                 hasError = true;
                 errorMsg = error.message;
                 break;
             }
-            successCount += batch.length;
+        }
+
+        if (!hasError) {
+            // Proceed to insert new records
+            for (let i = 0; i < records.length; i += BATCH_SIZE) {
+                const batch = records.slice(i, i + BATCH_SIZE);
+                const { error } = await supabase.from('leaves').insert(batch);
+                if (error) {
+                    hasError = true;
+                    errorMsg = error.message;
+                    break;
+                }
+                successCount += batch.length;
+            }
         }
 
         setLoading(false);

@@ -148,14 +148,22 @@ export function LeaveProvider({ children }) {
         // CHECK IF ALREADY EXISTS (Local Check)
         const existingLocal = leaves[shapeDate]?.find(l => l.messNumber === messNumber);
         if (existingLocal) {
-            // If already exists, and we are trying to make it admin granted but it's not currently, update it
             if (isAdminGranted && !existingLocal.isAdminGranted) {
-                // we will update db instead of insert
-            } else {
-                return { success: true, alreadyExists: true };
+                const { error: updError } = await supabase.from('leaves')
+                    .update({ is_admin_granted: true })
+                    .eq('mess_number', messNumber)
+                    .eq('leave_date', shapeDate)
+                    .eq('hostel_id', user.hostelId);
+                
+                if (updError) {
+                    console.error('Error updating leave override:', updError);
+                    fetchLeaves();
+                    return { success: false, error: updError.message };
+                }
+                return { success: true };
             }
+            return { success: true, alreadyExists: true };
         }
-
         // Optimistic update
         setLeaves(prev => {
             const current = prev[shapeDate] || [];
@@ -175,21 +183,6 @@ export function LeaveProvider({ children }) {
                 .eq('hostel_id', user.hostelId)
                 .single();
             if (data) sid = data.id;
-        }
-
-        if (existingLocal) {
-             const { error: updError } = await supabase.from('leaves')
-                 .update({ is_admin_granted: true })
-                 .eq('mess_number', messNumber)
-                 .eq('leave_date', shapeDate)
-                 .eq('hostel_id', user.hostelId);
-             
-             if (updError) {
-                 console.error('Error updating leave override:', updError);
-                 fetchLeaves();
-                 return { success: false, error: updError.message };
-             }
-             return { success: true };
         }
 
         const { error } = await supabase.from('leaves').insert([{
