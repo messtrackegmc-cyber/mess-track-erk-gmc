@@ -1,3 +1,4 @@
+import { formatDateLocal } from '../lib/utils';
 import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
@@ -63,8 +64,8 @@ export function LeaveProvider({ children }) {
             futureDate = new Date(now.getFullYear() + 1, 11, 31);
         }
 
-        const pastStr = pastDate.toISOString().split('T')[0];
-        const futureStr = futureDate.toISOString().split('T')[0];
+        const pastStr = formatDateLocal(pastDate);
+        const futureStr = formatDateLocal(futureDate);
 
         while (keepFetching) {
             let query = supabase

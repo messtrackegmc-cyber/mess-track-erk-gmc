@@ -1,3 +1,4 @@
+import { formatDateLocal } from '../lib/utils';
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../context/AuthContext';
@@ -22,7 +23,7 @@ export default function LeaveTillJoinList() {
 
     const fetchLeaveTillJoinRecords = async () => {
         setLoading(true);
-        const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+        const today = formatDateLocal(new Date()); // YYYY-MM-DD
         try {
             // Step 1: Find which students have an ACTIVE OR UPCOMING LTJ leave (>= today)
             const PAGE_SIZE = 1000;

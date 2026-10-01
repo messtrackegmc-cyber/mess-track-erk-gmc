@@ -1,3 +1,4 @@
+import { formatDateLocal } from '../lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLeaves } from '../context/LeaveContext';
@@ -10,7 +11,7 @@ export default function Dashboard() {
     const { isStudentOnLeave } = useLeaves();
     const navigate = useNavigate();
 
-    const today = new Date().toLocaleDateString('en-CA');
+    const today = formatDateLocal(new Date());
     const isOnLeaveToday = user?.messNumber ? isStudentOnLeave(user.messNumber, today) : false;
 
     const actions = [

@@ -1,3 +1,4 @@
+import { formatDateLocal } from '../lib/utils';
 import { useState } from 'react';
 import { useLeaves } from '../context/LeaveContext';
 import { supabase } from '../lib/supabaseClient';
@@ -29,7 +30,7 @@ export default function ManageLeaves() {
 
     // Helper to format date as YYYY-MM-DD for context
     const formatDateKey = (date) => {
-        return date.toISOString().split('T')[0];
+        return formatDateLocal(date);
     };
 
     const leavesForDate = [...getLeavesByDate(formatDateKey(selectedDate))]

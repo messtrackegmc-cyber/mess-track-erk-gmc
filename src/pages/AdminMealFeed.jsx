@@ -1,3 +1,4 @@
+import { formatDateLocal } from '../lib/utils';
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
@@ -19,7 +20,7 @@ export default function AdminMealFeed() {
     const fetchClaims = async (showToast = false) => {
         if (showToast) setIsRefreshing(true);
         try {
-            const today = new Date().toLocaleDateString('en-CA');
+            const today = formatDateLocal(new Date());
             
             // 1. Fetch claims for today
             const { data: claimsData, error: claimsError } = await supabase

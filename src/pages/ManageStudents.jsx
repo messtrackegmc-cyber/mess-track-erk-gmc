@@ -3,7 +3,7 @@ import { Card, CardContent } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import { Search, MoreHorizontal, Users, UserPlus, X, Loader2, Trash2 } from 'lucide-react';
-import { cn } from '../lib/utils';
+import { cn, formatDateLocal } from '../lib/utils';
 import { useStudents } from '../context/StudentContext';
 import { useLeaves } from '../context/LeaveContext';
 import { supabase } from '../lib/supabaseClient';
@@ -30,7 +30,7 @@ export default function ManageStudents() {
     const [addError, setAddError] = useState('');
     const [isAdding, setIsAdding] = useState(false);
 
-    const formatDateKey = (date) => date.toISOString().split('T')[0];
+    const formatDateKey = (date) => formatDateLocal(date);
 
     useEffect(() => {
         if (!user?.hostelId) return;

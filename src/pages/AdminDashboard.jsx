@@ -1,3 +1,4 @@
+import { formatDateLocal } from '../lib/utils';
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
@@ -18,7 +19,7 @@ export default function AdminDashboard({ showTomorrow = false }) {
     if (showTomorrow) {
         targetDate.setDate(targetDate.getDate() + 1);
     }
-    const dateKey = targetDate.toLocaleDateString('en-CA');
+    const dateKey = formatDateLocal(targetDate);
 
     useEffect(() => {
         if (!user?.hostelId) {

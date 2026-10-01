@@ -1,3 +1,4 @@
+import { formatDateLocal } from '../lib/utils';
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -70,7 +71,7 @@ export default function ClaimMeal() {
         setMealType(detectedMeal);
 
         // Check if student is on leave today
-        const today = new Date().toLocaleDateString('en-CA');
+        const today = formatDateLocal(new Date());
         const onLeave = isStudentOnLeave(user.messNumber, today);
         
         if (onLeave) {

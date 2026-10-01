@@ -1,3 +1,4 @@
+import { formatDateLocal } from '../lib/utils';
 import { useState, useEffect } from 'react';
 import { useHostel } from '../context/HostelContext';
 import { Button } from '../components/ui/button';
@@ -95,7 +96,7 @@ export default function AdminSettings() {
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `mess_backup_${new Date().toISOString().split('T')[0]}.json`;
+            a.download = `mess_backup_${formatDateLocal(new Date())}.json`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);

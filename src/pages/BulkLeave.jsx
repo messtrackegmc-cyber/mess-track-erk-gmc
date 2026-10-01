@@ -1,3 +1,4 @@
+import { formatDateLocal } from '../lib/utils';
 import { useState, useMemo, useCallback } from 'react';
 import { useStudents } from '../context/StudentContext';
 import { useAuth } from '../context/AuthContext';
@@ -25,7 +26,7 @@ import {
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-const formatDateKey = (date) => date.toISOString().split('T')[0];
+const formatDateKey = (date) => formatDateLocal(date);
 
 const dateRangeDates = (start, end) => {
     const dates = [];

@@ -1,3 +1,4 @@
+import { formatDateLocal } from '../lib/utils';
 import { useState, useEffect } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import LeaveCalendar from '../components/LeaveCalendar';
@@ -10,12 +11,6 @@ import { useLeaves } from '../context/LeaveContext';
 import { useAuth } from '../context/AuthContext';
 import { useHostel } from '../context/HostelContext';
 
-const formatDateLocal = (date) => {
-    const yyyy = date.getFullYear();
-    const mm = String(date.getMonth() + 1).padStart(2, '0');
-    const dd = String(date.getDate()).padStart(2, '0');
-    return `${yyyy}-${mm}-${dd}`;
-};
 
 const validateConsecutiveLeaves = (dates) => {
     const dateSet = new Set(dates.map(d => d.date));
@@ -251,7 +246,7 @@ export default function LeaveSelection() {
         });
     };
 
-    const futureDates = selectedDates.filter(l => l.date >= today.toISOString().split('T')[0]);
+    const futureDates = selectedDates.filter(l => l.date >= formatDateLocal(today));
 
     // Progress colour: green → amber → red
     const getProgressColor = () => {
