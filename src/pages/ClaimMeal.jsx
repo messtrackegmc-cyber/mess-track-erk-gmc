@@ -91,7 +91,22 @@ export default function ClaimMeal() {
 
         if (error) {
           if (error.code === '23505') {
-            setErrorMessage(`You have already claimed ${detectedMeal} today`);
+            // Fetch the existing claim to recover gracefully
+            const { data: existingClaim } = await supabase
+              .from('meal_claims')
+              .select('claimed_at')
+              .eq('student_id', user.id)
+              .eq('meal_type', detectedMeal)
+              .eq('claim_date', today)
+              .single();
+              
+            if (existingClaim) {
+               setClaimedAt(existingClaim.claimed_at);
+               setStatus('success');
+               return;
+            } else {
+               setErrorMessage(`You have already claimed ${detectedMeal} today`);
+            }
           } else {
             setErrorMessage(error.message || 'Failed to claim meal. Please try again.');
           }

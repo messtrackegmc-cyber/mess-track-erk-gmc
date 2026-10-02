@@ -5,8 +5,18 @@ import { CheckCircle2 } from 'lucide-react';
 export default function MealSuccessScreen({ studentName, messNumber, mealType, claimedAt, userMessType }) {
   const navigate = useNavigate();
   const [time, setTime] = useState(new Date());
-  const [timeLeft, setTimeLeft] = useState(300); // 5 minutes in seconds
-  const [expired, setExpired] = useState(false);
+  
+  const getInitialTimeLeft = () => {
+    if (!claimedAt) return 300;
+    const claimedTime = new Date(claimedAt).getTime();
+    const now = new Date().getTime();
+    const elapsedSeconds = Math.floor((now - claimedTime) / 1000);
+    return Math.max(0, 300 - elapsedSeconds);
+  };
+
+  const initialTimeLeft = getInitialTimeLeft();
+  const [timeLeft, setTimeLeft] = useState(initialTimeLeft);
+  const [expired, setExpired] = useState(initialTimeLeft === 0);
 
   useEffect(() => {
     const timer = setInterval(() => {
